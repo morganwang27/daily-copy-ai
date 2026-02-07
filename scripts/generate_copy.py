@@ -13,7 +13,7 @@ if not API_KEY:
 
 url = (
     "https://generativelanguage.googleapis.com/v1beta/models/"
-    "gemini-1.5-flash:generateContent"
+    "gemini-2.0-flash:generateContent"
     f"?key={API_KEY}"
 )
 
