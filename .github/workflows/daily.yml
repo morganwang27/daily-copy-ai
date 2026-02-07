@@ -1,28 +1,33 @@
 name: Daily AI Copy
 
 on:
-  workflow_dispatch:
   schedule:
-    - cron: "0 1 * * *"
-
-permissions:
-  contents: write
+    - cron: "0 1 * * *" # 每天台灣 09:00
+  workflow_dispatch:
 
 jobs:
   generate:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install openai
-      - env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Install deps
+        run: pip install requests
+
+      - name: Run generator
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python scripts/generate_copy.py
-      - run: |
+
+      - name: Commit output
+        run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add outputs/*.md
-          git commit -m "chore: daily AI copy" || echo "No changes"
+          git add outputs || true
+          git commit -m "daily copy $(date +'%Y-%m-%d')" || echo "No changes"
           git push
